@@ -1,14 +1,9 @@
 import hashlib
 import requests
-
 import sys
-
 from uuid import uuid4
-
 from timeit import default_timer as timer
-
 import random
-
 
 def proof_of_work(last_proof):
     """
@@ -19,28 +14,33 @@ def proof_of_work(last_proof):
     - p is the previous proof, and p' is the new proof
     - Use the same method to generate SHA-256 hashes as the examples in class
     """
+    #get the hex_hash for the last proof
+    last_proof = str(last_proof)
+    last_hash = last_proof.encode()
+    last_hash = hashlib.sha256(last_hash).hexdigest()
 
     start = timer()
-
     print("Searching for next proof")
-    proof = 0
-    #  TODO: Your code here
+
+    #starting at random float:
+    proof = random.random()
+    while not valid_proof(last_hash, proof):
+        proof += 1
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
     return proof
-
 
 def valid_proof(last_hash, proof):
     """
     Validates the Proof:  Multi-ouroborus:  Do the last six characters of
     the hash of the last proof match the first six characters of the hash
     of the new proof?
-
     IE:  last_hash: ...AE9123456, new hash 123456E88...
     """
+    guess = f'{proof}'.encode()
+    hex_hash = hashlib.sha256(guess).hexdigest()
 
-    # TODO: Your code here!
-    pass
+    return last_hash[-6:] == hex_hash[:6]
 
 
 if __name__ == '__main__':
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # Load or create ID
     f = open("my_id.txt", "r")
-    id = f.read()
+    id = f.read().strip('\n')
     print("ID is", id)
     f.close()
 
